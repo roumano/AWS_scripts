@@ -22,7 +22,7 @@ function backup_ebs () {
     for instance in $prod_instances
     do  
 
-        volumes=`aws ec2 describe-volumes --filter Name=attachment.instance-id,Values=$instance | jq .Volumes[].VolumeId | sed 's/\"//g'`
+        volumes=`aws ec2 describe-volumes --filter Name=attachment.instance-id,Values=$instance | jq -r ".Volumes[].VolumeId"`
         
         for volume in $volumes
         do
@@ -36,10 +36,10 @@ function backup_ebs () {
 
 function delete_snapshots () {
     
-    for snapshot in $(aws ec2 describe-snapshots --filters Name=description,Values=ebs-backup-script | jq .Snapshots[].SnapshotId | sed 's/\"//g')
+    for snapshot in $(aws ec2 describe-snapshots --filters Name=description,Values=ebs-backup-script | jq -r ".Snapshots[].SnapshotId")
     do
         #echo $snapshot
-        SNAPSHOTDATE=$(aws ec2 describe-snapshots --filters Name=snapshot-id,Values=$snapshot | jq .Snapshots[].StartTime | cut -d T -f1 | sed 's/\"//g')
+        SNAPSHOTDATE=$(aws ec2 describe-snapshots --filters Name=snapshot-id,Values=$snapshot | jq ".Snapshots[].StartTime" | cut -d T -f1)
         STARTDATE=$(date +%s)
         ENDDATE=$(date -d $SNAPSHOTDATE +%s)
         INTERVAL=$[ (STARTDATE - ENDDATE) / (60*60*24) ]
