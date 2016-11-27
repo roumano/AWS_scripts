@@ -32,6 +32,7 @@ function backup_ebs () {
                 echo "aws ec2 create-snapshot ${extra_args} --volume-id ${volume} --description \"ebs-backup-script\""
             else
                 aws ec2 create-snapshot ${extra_args} --volume-id ${volume} --description "ebs-backup-script"
+	    fi	
         done
 
     done
